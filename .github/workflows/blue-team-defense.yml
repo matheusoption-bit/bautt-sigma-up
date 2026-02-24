@@ -10,7 +10,7 @@ on:
 
 env:
   PYTHON_VERSION: '3.11'
-  COVERAGE_THRESHOLD: 100
+  COVERAGE_THRESHOLD: 85
 
 jobs:
 
@@ -89,7 +89,7 @@ jobs:
             --cov-report=html \
             --cov-report=term \
             --cov-fail-under=${{ env.COVERAGE_THRESHOLD }} \
-            -v || echo "Coverage check - continuing"
+            -v
       - name: Upload coverage report
         if: always()
         uses: actions/upload-artifact@v4
@@ -112,9 +112,9 @@ jobs:
       - name: Run ruleset auditor
         run: |
           python scripts/ci/audit_ruleset.py \
-            --ruleset services/atlas-engine/config/ruleset_v0.2.json \
+            --ruleset services/atlas-engine/config/atlas_ruleset_v0.2.json \
             --output-format markdown \
-            --output ruleset_audit_report.md || echo "Ruleset audit complete"
+            --output ruleset_audit_report.md
       - name: Detect rule conflicts
         run: python scripts/ci/detect_rule_conflicts.py
       - name: Validate fingerprint
@@ -151,7 +151,7 @@ jobs:
       - name: Run Bandit security linter
         run: |
           bandit -r services/ scripts/ -f json -o bandit-report.json \
-            --severity-level medium || echo "Bandit scan complete"
+            --severity-level medium
       - name: Upload security report
         if: always()
         uses: actions/upload-artifact@v4
@@ -174,8 +174,7 @@ jobs:
         run: pip install pytest fastapi httpx
       - name: Run rate limiting tests
         run: |
-          pytest services/atlas-engine/tests/security/test_rate_limiting.py -v \
-            || echo "Rate limiting tests complete"
+          pytest services/atlas-engine/tests/security/test_rate_limiting.py -v
 
   integration-tests:
     name: "\U0001F517 ATLAS + DELTA Integration Tests"
@@ -210,8 +209,7 @@ jobs:
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost/bautt_test
         run: |
-          pytest services/atlas-engine/tests/integration/ -v --tb=short \
-            || echo "Integration tests complete"
+          pytest services/atlas-engine/tests/integration/ -v --tb=short
 
   defense-report:
     name: "\U0001F4CA Generate Defense Dashboard"
