@@ -1,0 +1,4 @@
+# file: /home/runner/work/bautt-sigma-up/bautt-sigma-up/services/atlas-api/src/atlas_api/middleware/rate_limiter.py
+# hypothesis_version: 6.151.9
+
+[0.4, 9.5, 10.5, 429, 3600, '/atlas/evaluate', 'LOW_COVERAGE_ABUSE', 'RATE_LIMIT_EXCEEDED', 'THRESHOLD_PROBING', 'VALUE_ALTERNATION', 'blocked', 'coverage_score', 'details', 'error', 'field', 'fingerprint', 'flags_risco', 'message', 'metadata', 'overlaps_area_uniao', 'pattern', 'patterns', 'pct_app_area', 'reason', 'retry_after', 'solo_classe', 'type', 'values']

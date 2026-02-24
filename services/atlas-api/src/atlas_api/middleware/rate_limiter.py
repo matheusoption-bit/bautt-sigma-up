@@ -7,7 +7,7 @@ Detecta tentativas de exploração por padrões repetitivos.
 import hashlib
 import json
 import time
-from typing import Dict, Optional
+from typing import Dict, Optional, Any
 from collections import defaultdict
 from datetime import datetime, timedelta
 from fastapi import Request, HTTPException
@@ -27,7 +27,7 @@ class PayloadFingerprint(BaseModel):
     hash: str
     timestamp: datetime
     coverage_score: Optional[float] = None
-    critical_fields: Dict[str, any] = {}
+    critical_fields: Dict[str, Any] = {}
 
 
 class SmartRateLimiter:
