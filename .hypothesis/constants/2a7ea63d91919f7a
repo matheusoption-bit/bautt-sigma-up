@@ -1,4 +1,0 @@
-# file: /home/runner/work/bautt-sigma-up/bautt-sigma-up/services/atlas-api/src/atlas_api/main.py
-# hypothesis_version: 6.151.9
-
-[1.0, 409, 422, 429, 1000, '/atlas/evaluate', '/delta/apply-atlas', '/health', '0.1.0', '0.2.0', '409_GATING', '422_DELTA_ERROR', 'ATLAS_RULESET', 'Bautt ATLAS API', 'RATE_LIMIT_EXCEEDED', '_ruleset_fingerprint', 'atlas-engine', 'atlas_report', 'blocked', 'bloqueios', 'body', 'code', 'config', 'coverage_score', 'detail', 'details', 'error', 'http', 'http.request', 'message', 'metadata', 'name', 'ok', 'orcamento_ajustado', 'retry_after', 'ruleset_fingerprint', 'ruleset_name', 'ruleset_version', 'status', 'tempo_evaluate_ms', 'ts', 'type', 'utf-8', 'validation_warnings', 'version']
