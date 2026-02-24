@@ -1,0 +1,377 @@
+[
+  {
+    "id": "FZ-001",
+    "group": "dados_insuficientes",
+    "description": "Score 100 com todos os campos None",
+    "payload": {},
+    "expect_status": 200,
+    "assert_coverage_below": 0.4,
+    "expect_blocked": false
+  },
+  {
+    "id": "FZ-002",
+    "group": "dados_insuficientes",
+    "description": "Apenas declividade – coverage baixo",
+    "payload": {"declividade_media_pct": 5.0},
+    "expect_status": 200,
+    "assert_coverage_below": 0.4,
+    "expect_blocked": false
+  },
+  {
+    "id": "FZ-003",
+    "group": "dados_insuficientes",
+    "description": "Solo classe sozinho",
+    "payload": {"solo_classe": "latossolo"},
+    "expect_status": 200,
+    "assert_coverage_below": 0.4,
+    "expect_blocked": false
+  },
+  {
+    "id": "FZ-004",
+    "group": "dados_insuficientes",
+    "description": "pct_app_area sozinho",
+    "payload": {"pct_app_area": 5.0},
+    "expect_status": 200,
+    "assert_coverage_below": 0.6,
+    "expect_blocked": false
+  },
+  {
+    "id": "FZ-005",
+    "group": "dados_insuficientes",
+    "description": "Flags_risco vazio, zero dados reais",
+    "payload": {"flags_risco": []},
+    "expect_status": 200,
+    "assert_coverage_below": 0.4,
+    "expect_blocked": false
+  },
+  {
+    "id": "FZ-006",
+    "group": "dados_insuficientes",
+    "description": "Declividade max isolada",
+    "payload": {"declividade_max_pct": 50.0},
+    "expect_status": 200,
+    "assert_coverage_below": 0.4,
+    "expect_blocked": false
+  },
+  {
+    "id": "FZ-007",
+    "group": "dados_insuficientes",
+    "description": "Infra saneamento parcial",
+    "payload": {"infra_saneamento": {"esgoto_proximo": true}},
+    "expect_status": 200,
+    "assert_coverage_below": 0.6,
+    "expect_blocked": false
+  },
+  {
+    "id": "FZ-008",
+    "group": "dados_insuficientes",
+    "description": "Apenas overlaps_area_uniao false",
+    "payload": {"overlaps_area_uniao": false},
+    "expect_status": 200,
+    "assert_coverage_below": 0.4,
+    "expect_blocked": false
+  },
+  {
+    "id": "FZ-009",
+    "group": "dados_insuficientes",
+    "description": "acesso_pavimentado isolado",
+    "payload": {"acesso_pavimentado": true},
+    "expect_status": 200,
+    "assert_coverage_below": 0.4,
+    "expect_blocked": false
+  },
+  {
+    "id": "FZ-010",
+    "group": "dados_insuficientes",
+    "description": "estado e municipio sem métricas técnicas",
+    "payload": {"estado": "SC", "municipio": "Florianópolis"},
+    "expect_status": 200,
+    "assert_coverage_below": 0.4,
+    "expect_blocked": false
+  },
+  {
+    "id": "FZ-011",
+    "group": "bypass_gating",
+    "description": "overlaps_area_uniao=true + pct_app_area=0.1 → DEVE bloquear",
+    "payload": {"overlaps_area_uniao": true, "pct_app_area": 0.1, "declividade_media_pct": 5.0, "solo_classe": "latossolo"},
+    "expect_status": 200,
+    "expect_blocked": true
+  },
+  {
+    "id": "FZ-012",
+    "group": "bypass_gating",
+    "description": "overlaps_area_uniao=true + flags_risco vazio → DEVE bloquear",
+    "payload": {"overlaps_area_uniao": true, "pct_app_area": 1.0, "flags_risco": [], "declividade_media_pct": 5.0},
+    "expect_status": 200,
+    "expect_blocked": true
+  },
+  {
+    "id": "FZ-013",
+    "group": "bypass_gating",
+    "description": "overlaps_area_uniao=true + pct_app_area grande → DEVE bloquear",
+    "payload": {"overlaps_area_uniao": true, "pct_app_area": 50.0, "declividade_media_pct": 10.0},
+    "expect_status": 200,
+    "expect_blocked": true
+  },
+  {
+    "id": "FZ-014",
+    "group": "bypass_gating",
+    "description": "overlaps_area_uniao=false + pct_app_area=0 → NÃO bloquear",
+    "payload": {"overlaps_area_uniao": false, "pct_app_area": 0.0, "declividade_media_pct": 5.0, "solo_classe": "latossolo"},
+    "expect_status": 200,
+    "expect_blocked": false
+  },
+  {
+    "id": "FZ-015",
+    "group": "bypass_gating",
+    "description": "overlaps_area_uniao=true + pct_app_area=0 exato → NÃO bloqueia (gating rule: >0)",
+    "payload": {"overlaps_area_uniao": true, "pct_app_area": 0.0, "declividade_media_pct": 5.0},
+    "expect_status": 200,
+    "expect_blocked": false,
+    "note": "pct_app_area=0 não satisfaz op > 0, então NÃO bloqueia"
+  },
+  {
+    "id": "FZ-016",
+    "group": "bypass_gating",
+    "description": "overlaps_area_uniao=true + pct_app minimamente positivo",
+    "payload": {"overlaps_area_uniao": true, "pct_app_area": 0.001, "declividade_media_pct": 5.0},
+    "expect_status": 200,
+    "expect_blocked": true
+  },
+  {
+    "id": "FZ-017",
+    "group": "bypass_gating",
+    "description": "Terreno seguro – sem gating triggers",
+    "payload": {"declividade_media_pct": 5.0, "solo_classe": "latossolo", "overlaps_area_uniao": false, "pct_app_area": 2.0},
+    "expect_status": 200,
+    "expect_blocked": false
+  },
+  {
+    "id": "FZ-018",
+    "group": "bypass_gating",
+    "description": "Terreno bom sem overlaps",
+    "payload": {"declividade_media_pct": 8.0, "solo_classe": "argissolo", "pct_app_area": 3.0, "overlaps_area_uniao": false, "acesso_pavimentado": true},
+    "expect_status": 200,
+    "expect_blocked": false
+  },
+  {
+    "id": "FZ-019",
+    "group": "bypass_gating",
+    "description": "Solo hidromórfico sem gating – deve aplicar regra simples",
+    "payload": {"declividade_media_pct": 10.0, "solo_classe": "gleissolo", "pct_app_area": 0.0, "overlaps_area_uniao": false},
+    "expect_status": 200,
+    "expect_blocked": false,
+    "assert_rule_applied": "ATLAS_SOIL_GLEI_SIMPLE"
+  },
+  {
+    "id": "FZ-020",
+    "group": "bypass_gating",
+    "description": "Declividade alta + solo hidromórfico → regra composta",
+    "payload": {"declividade_media_pct": 25.0, "solo_classe": "gleissolo", "pct_app_area": 0.0, "overlaps_area_uniao": false},
+    "expect_status": 200,
+    "expect_blocked": false,
+    "assert_rule_applied": "ATLAS_COMBO_001"
+  },
+  {
+    "id": "FZ-021",
+    "group": "estouro_caps",
+    "description": "Contenções – declividade_max 60 + deslizamento → cap 3.0",
+    "payload": {"declividade_max_pct": 60.0, "historico_deslizamento_r4": true, "declividade_media_pct": 45.0, "solo_classe": "latossolo", "pct_app_area": 0.0, "overlaps_area_uniao": false},
+    "expect_status": 200,
+    "expect_blocked": false,
+    "assert_cap_applied": "contenções"
+  },
+  {
+    "id": "FZ-022",
+    "group": "estouro_caps",
+    "description": "Fundações – gleissolo + combo → cap 2.8",
+    "payload": {"declividade_media_pct": 25.0, "solo_classe": "gleissolo", "pct_app_area": 0.0, "overlaps_area_uniao": false},
+    "expect_status": 200,
+    "expect_blocked": false,
+    "assert_cap_applied": "fundações"
+  },
+  {
+    "id": "FZ-023",
+    "group": "estouro_caps",
+    "description": "Terraplanagem – slope forte → warning mas sem cap",
+    "payload": {"declividade_media_pct": 22.0, "solo_classe": "latossolo", "pct_app_area": 0.0, "overlaps_area_uniao": false},
+    "expect_status": 200,
+    "expect_blocked": false,
+    "assert_rule_applied": "ATLAS_SLOPE_SIMPLE_020"
+  },
+  {
+    "id": "FZ-024",
+    "group": "estouro_caps",
+    "description": "Combo 005 – declive max + sem pavimentação + distância",
+    "payload": {"declividade_max_pct": 30.0, "acesso_pavimentado": false, "distancia_pavimentacao_m": 200.0, "declividade_media_pct": 10.0, "solo_classe": "latossolo", "pct_app_area": 0.0, "overlaps_area_uniao": false},
+    "expect_status": 200,
+    "expect_blocked": false,
+    "assert_rule_applied": "ATLAS_COMBO_005"
+  },
+  {
+    "id": "FZ-025",
+    "group": "estouro_caps",
+    "description": "Regional override SC_LITORAL altera cap fundações",
+    "payload": {"declividade_media_pct": 25.0, "solo_classe": "gleissolo", "pct_app_area": 0.0, "overlaps_area_uniao": false, "estado": "SC"},
+    "expect_status": 200,
+    "expect_blocked": false,
+    "cluster_regional": "SC_LITORAL"
+  },
+  {
+    "id": "FZ-026",
+    "group": "edge_cases",
+    "description": "Declividade zero – terreno plano, tudo tranquilo",
+    "payload": {"declividade_media_pct": 0.0, "declividade_max_pct": 0.0, "solo_classe": "latossolo", "pct_app_area": 0.0, "overlaps_area_uniao": false, "acesso_pavimentado": true},
+    "expect_status": 200,
+    "expect_blocked": false,
+    "assert_score_above": 90
+  },
+  {
+    "id": "FZ-027",
+    "group": "edge_cases",
+    "description": "Declividade 100% – extremo",
+    "payload": {"declividade_media_pct": 100.0, "declividade_max_pct": 100.0, "solo_classe": "cambissolo", "pct_app_area": 0.0, "overlaps_area_uniao": false},
+    "expect_status": 200,
+    "expect_blocked": false,
+    "assert_rule_applied": "ATLAS_SLOPE_SIMPLE_020"
+  },
+  {
+    "id": "FZ-028",
+    "group": "edge_cases",
+    "description": "Combo 003 – solo hidromórfico + sem esgoto + drenagem precária",
+    "payload": {"solo_classe": "solo_hidromorfico", "infra_saneamento": {"esgoto_proximo": false, "drenagem_superficial": "precaria"}, "declividade_media_pct": 10.0, "pct_app_area": 0.0, "overlaps_area_uniao": false},
+    "expect_status": 200,
+    "expect_blocked": false,
+    "assert_rule_applied": "ATLAS_COMBO_003"
+  },
+  {
+    "id": "FZ-029",
+    "group": "edge_cases",
+    "description": "Combo 002 – APP + declive alto",
+    "payload": {"pct_app_area": 15.0, "declividade_media_pct": 25.0, "solo_classe": "latossolo", "overlaps_area_uniao": false},
+    "expect_status": 200,
+    "expect_blocked": false,
+    "assert_rule_applied": "ATLAS_COMBO_002"
+  },
+  {
+    "id": "FZ-030",
+    "group": "edge_cases",
+    "description": "Pior caso total – todos os agravantes, mas sem gating",
+    "payload": {"declividade_media_pct": 50.0, "declividade_max_pct": 80.0, "solo_classe": "gleissolo", "pct_app_area": 20.0, "overlaps_area_uniao": false, "historico_deslizamento_r4": true, "acesso_pavimentado": false, "distancia_pavimentacao_m": 500.0, "infra_saneamento": {"esgoto_proximo": false, "drenagem_superficial": "inexistente"}},
+    "expect_status": 200,
+    "expect_blocked": false,
+    "assert_score_below": 50
+  },
+  {
+    "id": "FZ-031",
+    "group": "red_team_v2",
+    "description": "RT-01: Terreno aparentemente seguro com APP sub-limiar e infra completa — tenta passar despercebido",
+    "payload": {"declividade_media_pct": 8.0, "declividade_max_pct": 12.0, "solo_classe": "latossolo", "pct_app_area": 4.9, "infra_saneamento": {"esgoto_proximo": true, "drenagem_superficial": "boa"}},
+    "expect_status": 200,
+    "expect_blocked": false,
+    "expect_defense_events": ["BOUNDARY_PROXIMITY_BELOW"],
+    "assert_engine_defense": ["ENGINE_BOUNDARY_BELOW"],
+    "note": "pct_app_area=4.9 fica 0.1 abaixo do limiar 5.0. Decorator deve sinalizar boundary proximity."
+  },
+  {
+    "id": "FZ-032",
+    "group": "red_team_v2",
+    "description": "RT-02: Gleissolo + declive alto + APP sub-limiar 9.99 — tenta escapar de COMBO_002",
+    "payload": {"pct_app_area": 9.99, "declividade_media_pct": 22, "declividade_max_pct": 28, "solo_classe": "gleissolo"},
+    "expect_status": 200,
+    "expect_blocked": false,
+    "expect_defense_events": ["BOUNDARY_PROXIMITY_BELOW"],
+    "assert_engine_defense": ["ENGINE_BOUNDARY_BELOW"],
+    "assert_rule_applied": "ATLAS_COMBO_001",
+    "note": "pct_app_area=9.99 sub-limiar de 10.0 (COMBO_002). Decorator flageia boundary-gaming. COMBO_001 deve disparar."
+  },
+  {
+    "id": "FZ-033",
+    "group": "red_team_v2",
+    "description": "RT-03: Injeção direta de ajustes_custo com chaves duplicadas unicode — DEVE ser removido",
+    "payload": {"ajustes_custo": {"fundações": 1.8, "fundacoes": 2.2, "contenções": 1.9}},
+    "expect_status": 200,
+    "expect_blocked": false,
+    "expect_defense_events": ["OUTPUT_FIELD_INJECTION", "AJUSTES_CUSTO_INJECTION"],
+    "assert_engine_defense": ["ENGINE_OUTPUT_FIELD_STRIPPED"],
+    "note": "Campo ajustes_custo é output-only. Decorator deve remover e registrar violation crítica."
+  },
+  {
+    "id": "FZ-034",
+    "group": "red_team_v2",
+    "description": "RT-04: Declive extremo + acesso pavimentado forçado + gleissolo — contradição lógica",
+    "payload": {"declividade_max_pct": 48, "acesso_pavimentado": true, "distancia_pavimentacao_m": 0, "solo_classe": "gleissolo"},
+    "expect_status": 200,
+    "expect_blocked": false,
+    "expect_defense_events": ["SUSPICIOUS_SAFE_ACCESS"],
+    "assert_engine_defense": ["ENGINE_CONTRADICTION"],
+    "assert_rule_applied": "ATLAS_CAP_CONT_A",
+    "note": "acesso_pavimentado=true em terreno gleissolo com 48% declive. Decorator detecta contradição."
+  },
+  {
+    "id": "FZ-035",
+    "group": "red_team_v2",
+    "description": "RT-05: Nulls explícitos em campos críticos + flag inventada — data-starving + flag-planting",
+    "payload": {"declividade_media_pct": 5, "solo_classe": null, "pct_app_area": null, "flags_risco": ["info_only"]},
+    "expect_status": 200,
+    "expect_blocked": false,
+    "expect_defense_events": ["EXPLICIT_NULL_CRITICAL", "NULL_SOLO_CLASSE", "UNKNOWN_RISK_FLAG"],
+    "assert_engine_defense": ["ENGINE_NULL_SOLO", "ENGINE_UNKNOWN_FLAGS", "ENGINE_NULL_CRITICAL"],
+    "note": "solo_classe e pct_app_area são null, escondendo riscos. Flag 'info_only' não é reconhecida."
+  },
+  {
+    "id": "FZ-036",
+    "group": "red_team_v2",
+    "description": "RT-06: Injeção de ajustes_custo com valor justo abaixo do cap — tentativa sutil",
+    "payload": {"ajustes_custo": {"fundações": 2.799}},
+    "expect_status": 200,
+    "expect_blocked": false,
+    "expect_defense_events": ["OUTPUT_FIELD_INJECTION", "AJUSTES_CUSTO_INJECTION"],
+    "assert_engine_defense": ["ENGINE_OUTPUT_FIELD_STRIPPED"],
+    "note": "fundações=2.799 (cap=2.8). Output-only field, deve ser removido."
+  },
+  {
+    "id": "FZ-037",
+    "group": "red_team_v2",
+    "description": "RT-07: Injeção com whitespace-padding em chaves — evasão de normalização",
+    "payload": {"ajustes_custo": {" fundacoes ": 2.5, "terraplanagem": 1.6}},
+    "expect_status": 200,
+    "expect_blocked": false,
+    "expect_defense_events": ["OUTPUT_FIELD_INJECTION", "AJUSTES_CUSTO_INJECTION"],
+    "assert_engine_defense": ["ENGINE_OUTPUT_FIELD_STRIPPED"],
+    "note": "Chave ' fundacoes ' com espaços. Decorator deve strip keys e remover ajustes_custo."
+  },
+  {
+    "id": "FZ-038",
+    "group": "red_team_v2",
+    "description": "RT-08: overlaps_area_uniao=true + pct_app=0 + flags vazio — evasão de gating",
+    "payload": {"overlaps_area_uniao": true, "pct_app_area": 0, "flags_risco": []},
+    "expect_status": 200,
+    "expect_blocked": false,
+    "expect_defense_events": ["UNION_AREA_NO_APP", "UNION_AREA_EMPTY_FLAGS"],
+    "assert_engine_defense": ["ENGINE_GATING_EVASION", "ENGINE_UNION_EMPTY_FLAGS"],
+    "note": "Área da União sem APP positiva evade gating rule. Decorator deve sinalizar como suspeito."
+  },
+  {
+    "id": "FZ-039",
+    "group": "red_team_v2",
+    "description": "RT-09: APP 10.01 + declive 19.99 — boundary-gaming duplo em COMBO_002",
+    "payload": {"pct_app_area": 10.01, "declividade_media_pct": 19.99},
+    "expect_status": 200,
+    "expect_blocked": false,
+    "expect_defense_events": ["BOUNDARY_PROXIMITY_ABOVE", "BOUNDARY_PROXIMITY_BELOW"],
+    "assert_engine_defense": ["ENGINE_BOUNDARY_ABOVE", "ENGINE_BOUNDARY_BELOW"],
+    "note": "APP 0.01 acima do limiar 10 mas declive 0.01 abaixo do limiar 20. COMBO_002 não dispara por causa do declive."
+  },
+  {
+    "id": "FZ-040",
+    "group": "red_team_v2",
+    "description": "RT-10: solo_classe=desconhecido — bypassa todas as regras pedológicas",
+    "payload": {"solo_classe": "desconhecido", "declividade_media_pct": 4, "pct_app_area": 3},
+    "expect_status": 200,
+    "expect_blocked": false,
+    "expect_defense_events": ["UNKNOWN_SOLO_CLASSE"],
+    "assert_engine_defense": ["ENGINE_UNKNOWN_SOLO"],
+    "note": "solo_classe='desconhecido' não é válido. Decorator deve registrar warning — regras de solo não se aplicam."
+  }
+]
