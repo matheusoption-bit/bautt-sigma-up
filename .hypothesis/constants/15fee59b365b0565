@@ -1,0 +1,4 @@
+# file: C:\Users\mathe\Documents\0000000\bautt-sigma-up\services\delta-engine\src\delta_engine\integration_contract.py
+# hypothesis_version: 6.151.9
+
+[0.0, 1e-09, 1e-06, 0.03, 0.04, 0.06, 1.0, 2.0, ',', '0.1.0', ':', 'ajustes_custo', 'atlas', 'atlas_engine_version', 'atlas_ruleset_id', 'bloqueios', 'breakdown_ajustes', 'contenções', 'cost_brl', 'cost_brl_estimado', 'custo_terreno_brl', 'delta_engine_version', 'delta_vgv_brl', 'distribuicao_custos', 'drenagem', 'fator_area_util', 'fator_atlas', 'fatores', 'fundações', 'hash_rastreabilidade', 'impacto_brl', 'infraestrutura', 'itens', 'm', 'macroetapa', 'macroetapas', 'meses', 'metadata', 'orcamento_base', 'orcamento_cub', 'preco_venda_m2', 'premissas_area', 'premissas_preco', 'rastreabilidade', 'regras_aplicadas', 'ruleset_id', 'terraplanagem', 'unidade_ref', 'utf-8', 'valor_ajustado_brl', 'valor_base_brl', 'vb', 'versao_ruleset', 'vgv_ajustado_brl', 'vgv_base_brl']

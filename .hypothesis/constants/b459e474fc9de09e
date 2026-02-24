@@ -1,0 +1,4 @@
+# file: C:\Users\mathe\Documents\0000000\bautt-sigma-up\services\atlas-api\src\atlas_api\middleware\rate_limiter.py
+# hypothesis_version: 6.151.9
+
+[60.0, 429, '/atlas/', 'RATE_LIMIT_EXCEEDED', 'detail', 'error', 'message', 'retry_after', 'unknown']

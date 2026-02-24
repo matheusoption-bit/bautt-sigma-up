@@ -10,6 +10,8 @@ class InfraSaneamento(BaseModel):
     drenagem_superficial: Optional[Literal["boa", "regular", "precaria", "inexistente"]] = None
 
 class TerrainMetricsInput(BaseModel):
+    model_config = {"extra": "allow"}
+
     cluster_regional: ClusterRegional = "BR_DEFAULT"
 
     # common fields used by ATLAS ruleset
@@ -27,6 +29,7 @@ class TerrainMetricsInput(BaseModel):
     distancia_pavimentacao_m: Optional[float] = None
 
     overlaps_area_uniao: Optional[bool] = None
+    historico_deslizamento_r4: Optional[bool] = None
     flags_risco: Optional[List[str]] = None
 
     infra_saneamento: Optional[InfraSaneamento] = None
@@ -74,9 +77,12 @@ class TerrainMetricsInput(BaseModel):
 class AlertItem(BaseModel):
     severity: Literal["info", "warning", "critical"]
     code: str
-    message: str
+    message: Optional[str] = Field(default=None, alias="message")
+    mensagem: Optional[str] = Field(default=None)
     regra_id: Optional[str] = None
     macroetapa: Optional[str] = None
+
+    model_config = {"populate_by_name": True, "extra": "allow"}
 
 class ATLASReportResponse(BaseModel):
     score_fisico: int

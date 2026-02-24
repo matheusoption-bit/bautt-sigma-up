@@ -309,5 +309,109 @@ class TestATLASEngineV02(unittest.TestCase):
         self.assertGreater(out.custo_total_revisado_brl, out.custo_total_base_brl)
 
 
+class TestATLASEngineCoverage(unittest.TestCase):
+    """Testes extras para cobrir edge-cases e atingir 85%+ de cobertura."""
+
+    def test_ruleset_deve_ser_dict(self):
+        """TypeError se ruleset não for dict."""
+        with self.assertRaises(TypeError):
+            ATLASEngine(ruleset="not a dict")
+        with self.assertRaises(TypeError):
+            ATLASEngine(ruleset=[1, 2])
+
+    def test_property_ruleset_retorna_copia(self):
+        """Acessa .ruleset e verifica que é cópia independente."""
+        engine = ATLASEngine(ruleset=RULESET_V02)
+        r = engine.ruleset
+        self.assertEqual(r["version"], "0.2.0")
+        r["version"] = "HACK"
+        self.assertEqual(engine.ruleset["version"], "0.2.0")  # não foi mutado
+
+    def test_alias_normalization_declividade_avg(self):
+        """Campo declividade_avg é normalizado para declividade_media_pct."""
+        engine = ATLASEngine(ruleset=RULESET_V02)
+        rep = engine.evaluate({"declividade_avg": 25, "solo_classe": "latossolo"})
+        self.assertIn("ATLAS_SLOPE_SIMPLE_020", rep["regras_aplicadas"])
+
+    def test_alias_normalization_area_app_pct(self):
+        """Campo area_app_pct é normalizado para pct_app_area."""
+        engine = ATLASEngine(ruleset=RULESET_V02)
+        rep = engine.evaluate({
+            "area_app_pct": 15,
+            "declividade_media_pct": 25,
+            "solo_classe": "latossolo",
+            "overlaps_area_uniao": False,
+        })
+        self.assertIn("ATLAS_COMBO_002", rep["regras_aplicadas"])
+
+    def test_alias_normalization_declividade_max(self):
+        """Campo declividade_max normalizado para declividade_max_pct."""
+        engine = ATLASEngine(ruleset=RULESET_V02)
+        rep = engine.evaluate({"declividade_max": 50, "declividade_media_pct": 10})
+        self.assertIn("ATLAS_CAP_CONT_A", rep["regras_aplicadas"])
+
+    def test_normalize_tipo_solo_argissolo(self):
+        """tipo_solo 'Argissolo' normalizado para solo_classe 'argissolo'."""
+        engine = ATLASEngine(ruleset=RULESET_V02)
+        rep = engine.evaluate({"tipo_solo": "Argissolo Vermelho-Amarelo", "declividade_media_pct": 5})
+        # Argissolo não dispara nenhuma regra especial, mas não deve crashar
+        self.assertIsInstance(rep["score_fisico"], int)
+
+    def test_normalize_tipo_solo_espodossolo(self):
+        """tipo_solo 'Espodossolo' reconhecido."""
+        engine = ATLASEngine(ruleset=RULESET_V02)
+        rep = engine.evaluate({"tipo_solo": "Espodossolo Humilúvico", "declividade_media_pct": 5})
+        self.assertIsInstance(rep["score_fisico"], int)
+
+    def test_merge_strategy_first_match(self):
+        """Estratégia first_match usa o primeiro fator != 1.0."""
+        ruleset = {
+            "version": "test",
+            "regras_simples": [
+                {"rule_id": "A", "priority": 100,
+                 "when": {"metric": "x", "op": ">=", "value": 0},
+                 "effect": {"macro_factors": {"fundacoes": 1.3}},
+                 "conflict_resolution": {"strategy": "first_match"}},
+                {"rule_id": "B", "priority": 90,
+                 "when": {"metric": "x", "op": ">=", "value": 0},
+                 "effect": {"macro_factors": {"fundacoes": 1.6}},
+                 "conflict_resolution": {"strategy": "first_match"}},
+            ],
+        }
+        engine = ATLASEngine(ruleset=ruleset)
+        rep = engine.evaluate({"x": 1})
+        self.assertAlmostEqual(rep["ajustes_custo"]["fundações"], 1.3, places=4)
+
+    def test_merge_strategy_sum_clamped(self):
+        """Estratégia sum_clamped soma deltas acima de 1.0."""
+        ruleset = {
+            "version": "test",
+            "regras_simples": [
+                {"rule_id": "A", "priority": 100,
+                 "when": {"metric": "x", "op": ">=", "value": 0},
+                 "effect": {"macro_factors": {"fundacoes": 1.3}},
+                 "conflict_resolution": {"strategy": "sum_clamped"}},
+                {"rule_id": "B", "priority": 90,
+                 "when": {"metric": "x", "op": ">=", "value": 0},
+                 "effect": {"macro_factors": {"fundacoes": 1.5}},
+                 "conflict_resolution": {"strategy": "sum_clamped"}},
+            ],
+        }
+        engine = ATLASEngine(ruleset=ruleset)
+        rep = engine.evaluate({"x": 1})
+        # sum_clamped: 1.0 + 0.3 + 0.5 = 1.8
+        self.assertAlmostEqual(rep["ajustes_custo"]["fundações"], 1.8, places=4)
+
+    def test_distancia_pavimentacao_infere_acesso_pavimentado(self):
+        """distancia_pavimentacao_m > 0 gera acesso_pavimentado = False."""
+        engine = ATLASEngine(ruleset=RULESET_V02)
+        rep = engine.evaluate({
+            "declividade_max_pct": 30,
+            "distancia_pavimentacao_m": 200,
+            "declividade_media_pct": 10,
+        })
+        self.assertIn("ATLAS_COMBO_005", rep["regras_aplicadas"])
+
+
 if __name__ == "__main__":
     unittest.main()

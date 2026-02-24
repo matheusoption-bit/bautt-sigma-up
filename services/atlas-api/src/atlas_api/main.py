@@ -29,6 +29,10 @@ ENGINE = ATLASEngine(ruleset=_load_ruleset())
 
 app = FastAPI(title="Bautt ATLAS API", version="0.1.0")
 
+# ---- Rate limiter middleware (60 req/min por IP em /atlas/*) ----
+from atlas_api.middleware.rate_limiter import SmartRateLimiter  # noqa: E402
+app.add_middleware(SmartRateLimiter, max_rpm=60)
+
 @app.get("/health")
 def health():
     return {"status": "ok", "ts": int(time.time())}
