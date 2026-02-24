@@ -50,11 +50,18 @@ jobs:
           if [ -f services/atlas-engine/requirements.txt ]; then
             pip install -r services/atlas-engine/requirements.txt
           fi
+          if [ -f services/atlas-api/requirements.txt ]; then
+            pip install -r services/atlas-api/requirements.txt
+          fi
+          # Install services in editable mode for imports
+          pip install -e services/atlas-engine
+          pip install -e services/atlas-api
+          pip install -e services/delta-engine
       - name: Run Grok Fuzz Pack (30 cases)
-        run: pytest services/atlas-engine/tests/security/test_fuzz_pack.py -v --tb=short
+        run: pytest services/atlas-api/tests/security/test_grok_fuzz_pack.py -v --tb=short
       - name: Run Hypothesis property tests
         run: |
-          pytest services/atlas-engine/tests/security/test_hypothesis_fuzzing.py \
+          pytest services/atlas-api/tests/security/test_hypothesis_fuzzing.py \
             --hypothesis-show-statistics -v
       - name: Upload fuzz results
         if: always()

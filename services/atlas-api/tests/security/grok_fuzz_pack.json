@@ -1,0 +1,484 @@
+{
+  "test_suite": "Grok Fuzz Pack - 30 Attack Vectors",
+  "version": "1.0",
+  "categories": {
+    "insufficient_data": "Tests attempting high scores with insufficient data coverage",
+    "gating_bypass": "Tests attempting to bypass gating rules",
+    "cap_overflow": "Tests attempting to overflow cost adjustment caps"
+  },
+  "test_cases": [
+    {
+      "id": "FZ-001",
+      "category": "insufficient_data",
+      "description": "Score 100 with zero data - all fields None",
+      "payload": {
+        "declividade_media_pct": null,
+        "solo_classe": null,
+        "pct_app_area": null,
+        "overlaps_area_uniao": null,
+        "historico_deslizamento_r4": null
+      },
+      "expected": {
+        "status_code": 422,
+        "has_coverage_warning": true,
+        "min_coverage_score": 0.0,
+        "max_coverage_score": 0.0
+      }
+    },
+    {
+      "id": "FZ-002",
+      "category": "insufficient_data",
+      "description": "Score alto with coverage < 0.4 - only 1 field",
+      "payload": {
+        "declividade_media_pct": 5.0
+      },
+      "expected": {
+        "status_code": 422,
+        "has_coverage_warning": true,
+        "max_coverage_score": 0.4
+      }
+    },
+    {
+      "id": "FZ-003",
+      "category": "insufficient_data",
+      "description": "Missing critical field: solo_classe",
+      "payload": {
+        "declividade_media_pct": 15.0,
+        "pct_app_area": 0.0,
+        "overlaps_area_uniao": false
+      },
+      "expected": {
+        "status_code": 422,
+        "has_coverage_warning": true
+      }
+    },
+    {
+      "id": "FZ-004",
+      "category": "insufficient_data",
+      "description": "Missing critical field: declividade_media_pct",
+      "payload": {
+        "solo_classe": "ARGILOSO",
+        "pct_app_area": 2.0,
+        "overlaps_area_uniao": false
+      },
+      "expected": {
+        "status_code": 422,
+        "has_coverage_warning": true
+      }
+    },
+    {
+      "id": "FZ-005",
+      "category": "insufficient_data",
+      "description": "Two fields only - insufficient coverage",
+      "payload": {
+        "declividade_media_pct": 10.0,
+        "solo_classe": "ARENOSO"
+      },
+      "expected": {
+        "status_code": 422,
+        "has_coverage_warning": true
+      }
+    },
+    {
+      "id": "FZ-006",
+      "category": "insufficient_data",
+      "description": "All boolean flags missing",
+      "payload": {
+        "declividade_media_pct": 12.0,
+        "solo_classe": "ARGILOSO",
+        "pct_app_area": 3.0
+      },
+      "expected": {
+        "status_code": 422,
+        "has_coverage_warning": true
+      }
+    },
+    {
+      "id": "FZ-007",
+      "category": "insufficient_data",
+      "description": "Coverage at exactly 0.3 threshold",
+      "payload": {
+        "declividade_media_pct": 8.0,
+        "solo_classe": null,
+        "pct_app_area": null
+      },
+      "expected": {
+        "status_code": 422,
+        "has_coverage_warning": true,
+        "max_coverage_score": 0.4
+      }
+    },
+    {
+      "id": "FZ-008",
+      "category": "insufficient_data",
+      "description": "Null critical terrain metrics",
+      "payload": {
+        "overlaps_area_uniao": true,
+        "historico_deslizamento_r4": true
+      },
+      "expected": {
+        "status_code": 422,
+        "has_coverage_warning": true
+      }
+    },
+    {
+      "id": "FZ-009",
+      "category": "insufficient_data",
+      "description": "Empty flags_risco with minimal data",
+      "payload": {
+        "declividade_media_pct": 5.0,
+        "flags_risco": []
+      },
+      "expected": {
+        "status_code": 422,
+        "has_coverage_warning": true
+      }
+    },
+    {
+      "id": "FZ-010",
+      "category": "insufficient_data",
+      "description": "Only risk flags, no terrain data",
+      "payload": {
+        "overlaps_area_uniao": true,
+        "historico_deslizamento_r4": true,
+        "flags_risco": ["ALTA_DECLIVIDADE", "SOLO_INADEQUADO"]
+      },
+      "expected": {
+        "status_code": 422,
+        "has_coverage_warning": true
+      }
+    },
+    {
+      "id": "FZ-011",
+      "category": "gating_bypass",
+      "description": "Bypass gating: area Uniao + APP 0.1%",
+      "payload": {
+        "overlaps_area_uniao": true,
+        "pct_app_area": 0.1,
+        "declividade_media_pct": 5.0,
+        "solo_classe": "ARGILOSO"
+      },
+      "expected": {
+        "status_code": 200,
+        "viabilidade_bloqueada": true,
+        "must_have_alert_code": "ATLAS_COMBO_004"
+      }
+    },
+    {
+      "id": "FZ-012",
+      "category": "gating_bypass",
+      "description": "Bypass with empty flags_risco but overlaps_area_uniao",
+      "payload": {
+        "overlaps_area_uniao": true,
+        "flags_risco": [],
+        "declividade_media_pct": 5.0,
+        "solo_classe": "ARGILOSO",
+        "pct_app_area": 0.0
+      },
+      "expected": {
+        "status_code": 200,
+        "viabilidade_bloqueada": true
+      }
+    },
+    {
+      "id": "FZ-013",
+      "category": "gating_bypass",
+      "description": "APP exactly at 10% threshold",
+      "payload": {
+        "pct_app_area": 10.0,
+        "declividade_media_pct": 8.0,
+        "solo_classe": "ARENOSO",
+        "overlaps_area_uniao": false
+      },
+      "expected": {
+        "status_code": 200,
+        "viabilidade_bloqueada": true
+      }
+    },
+    {
+      "id": "FZ-014",
+      "category": "gating_bypass",
+      "description": "APP at 9.99% trying to bypass 10% threshold",
+      "payload": {
+        "pct_app_area": 9.99,
+        "declividade_media_pct": 8.0,
+        "solo_classe": "ARENOSO",
+        "overlaps_area_uniao": false
+      },
+      "expected": {
+        "status_code": 200,
+        "viabilidade_bloqueada": false
+      }
+    },
+    {
+      "id": "FZ-015",
+      "category": "gating_bypass",
+      "description": "High slope (20%) trying to pass with good soil",
+      "payload": {
+        "declividade_media_pct": 20.0,
+        "solo_classe": "ROCHOSO",
+        "pct_app_area": 0.0,
+        "overlaps_area_uniao": false
+      },
+      "expected": {
+        "status_code": 200,
+        "viabilidade_bloqueada": true
+      }
+    },
+    {
+      "id": "FZ-016",
+      "category": "gating_bypass",
+      "description": "Slope at 19.99% trying to bypass 20% threshold",
+      "payload": {
+        "declividade_media_pct": 19.99,
+        "solo_classe": "ARGILOSO",
+        "pct_app_area": 0.0,
+        "overlaps_area_uniao": false
+      },
+      "expected": {
+        "status_code": 200,
+        "viabilidade_bloqueada": false
+      }
+    },
+    {
+      "id": "FZ-017",
+      "category": "gating_bypass",
+      "description": "Multiple gating flags but trying minimal values",
+      "payload": {
+        "declividade_media_pct": 19.5,
+        "pct_app_area": 9.5,
+        "overlaps_area_uniao": false,
+        "solo_classe": "ARENOSO"
+      },
+      "expected": {
+        "status_code": 200,
+        "viabilidade_bloqueada": false
+      }
+    },
+    {
+      "id": "FZ-018",
+      "category": "gating_bypass",
+      "description": "Historico deslizamento with low risk terrain",
+      "payload": {
+        "historico_deslizamento_r4": true,
+        "declividade_media_pct": 5.0,
+        "solo_classe": "ROCHOSO",
+        "pct_app_area": 0.0,
+        "overlaps_area_uniao": false
+      },
+      "expected": {
+        "status_code": 200,
+        "viabilidade_bloqueada": true
+      }
+    },
+    {
+      "id": "FZ-019",
+      "category": "gating_bypass",
+      "description": "Combining APP + overlaps at edge values",
+      "payload": {
+        "pct_app_area": 10.01,
+        "overlaps_area_uniao": true,
+        "declividade_media_pct": 8.0,
+        "solo_classe": "ARGILOSO"
+      },
+      "expected": {
+        "status_code": 200,
+        "viabilidade_bloqueada": true
+      }
+    },
+    {
+      "id": "FZ-020",
+      "category": "gating_bypass",
+      "description": "False negative test: all good conditions",
+      "payload": {
+        "declividade_media_pct": 5.0,
+        "solo_classe": "ROCHOSO",
+        "pct_app_area": 0.0,
+        "overlaps_area_uniao": false,
+        "historico_deslizamento_r4": false
+      },
+      "expected": {
+        "status_code": 200,
+        "viabilidade_bloqueada": false
+      }
+    },
+    {
+      "id": "FZ-021",
+      "category": "cap_overflow",
+      "description": "Estouro cap contenções - high slope + history",
+      "payload": {
+        "declividade_max_pct": 60.0,
+        "historico_deslizamento_r4": true,
+        "declividade_media_pct": 45.0,
+        "solo_classe": "ARGILOSO",
+        "pct_app_area": 0.0,
+        "overlaps_area_uniao": false
+      },
+      "expected": {
+        "status_code": 200,
+        "has_ajustes_custo": true,
+        "macroetapa": "contenções",
+        "max_fator_ajuste": 3.0
+      }
+    },
+    {
+      "id": "FZ-022",
+      "category": "cap_overflow",
+      "description": "Estouro cap fundações - worst soil conditions",
+      "payload": {
+        "solo_classe": "TURFOSO",
+        "nspt_medio": 2,
+        "lencol_freatico_profundidade_m": 0.5,
+        "declividade_media_pct": 5.0,
+        "pct_app_area": 0.0,
+        "overlaps_area_uniao": false
+      },
+      "expected": {
+        "status_code": 200,
+        "has_ajustes_custo": true,
+        "macroetapa": "fundações",
+        "max_fator_ajuste": 2.5
+      }
+    },
+    {
+      "id": "FZ-023",
+      "category": "cap_overflow",
+      "description": "Extreme declividade trying to overflow factor",
+      "payload": {
+        "declividade_media_pct": 50.0,
+        "declividade_max_pct": 70.0,
+        "solo_classe": "ARGILOSO",
+        "pct_app_area": 0.0,
+        "overlaps_area_uniao": false
+      },
+      "expected": {
+        "status_code": 200,
+        "has_ajustes_custo": true,
+        "macroetapa": "contenções",
+        "max_fator_ajuste": 3.0
+      }
+    },
+    {
+      "id": "FZ-024",
+      "category": "cap_overflow",
+      "description": "Multiple bad conditions on fundações",
+      "payload": {
+        "solo_classe": "TURFOSO",
+        "nspt_medio": 1,
+        "lencol_freatico_profundidade_m": 0.3,
+        "declividade_media_pct": 5.0,
+        "pct_app_area": 0.0,
+        "overlaps_area_uniao": false
+      },
+      "expected": {
+        "status_code": 200,
+        "has_ajustes_custo": true,
+        "macroetapa": "fundações",
+        "max_fator_ajuste": 2.5
+      }
+    },
+    {
+      "id": "FZ-025",
+      "category": "cap_overflow",
+      "description": "Testing clamp at exactly max cap value",
+      "payload": {
+        "declividade_media_pct": 48.0,
+        "declividade_max_pct": 65.0,
+        "historico_deslizamento_r4": true,
+        "solo_classe": "ARGILOSO",
+        "pct_app_area": 0.0,
+        "overlaps_area_uniao": false
+      },
+      "expected": {
+        "status_code": 200,
+        "has_ajustes_custo": true,
+        "macroetapa": "contenções",
+        "max_fator_ajuste": 3.0
+      }
+    },
+    {
+      "id": "FZ-026",
+      "category": "cap_overflow",
+      "description": "Terraplanagem with extreme slope",
+      "payload": {
+        "declividade_media_pct": 40.0,
+        "declividade_max_pct": 55.0,
+        "solo_classe": "ROCHOSO",
+        "pct_app_area": 0.0,
+        "overlaps_area_uniao": false
+      },
+      "expected": {
+        "status_code": 200,
+        "has_ajustes_custo": true
+      }
+    },
+    {
+      "id": "FZ-027",
+      "category": "cap_overflow",
+      "description": "Combined worst case: slope + soil + water",
+      "payload": {
+        "declividade_media_pct": 35.0,
+        "solo_classe": "TURFOSO",
+        "lencol_freatico_profundidade_m": 0.4,
+        "nspt_medio": 2,
+        "pct_app_area": 0.0,
+        "overlaps_area_uniao": false
+      },
+      "expected": {
+        "status_code": 200,
+        "has_ajustes_custo": true
+      }
+    },
+    {
+      "id": "FZ-028",
+      "category": "cap_overflow",
+      "description": "Edge case: declividade at 20.0% exact",
+      "payload": {
+        "declividade_media_pct": 20.0,
+        "declividade_max_pct": 25.0,
+        "solo_classe": "ARGILOSO",
+        "pct_app_area": 0.0,
+        "overlaps_area_uniao": false
+      },
+      "expected": {
+        "status_code": 200,
+        "viabilidade_bloqueada": true
+      }
+    },
+    {
+      "id": "FZ-029",
+      "category": "cap_overflow",
+      "description": "Testing infrastructure cap with max values",
+      "payload": {
+        "declividade_media_pct": 30.0,
+        "solo_classe": "ARGILOSO",
+        "historico_deslizamento_r4": true,
+        "pct_app_area": 0.0,
+        "overlaps_area_uniao": false
+      },
+      "expected": {
+        "status_code": 200,
+        "has_ajustes_custo": true
+      }
+    },
+    {
+      "id": "FZ-030",
+      "category": "cap_overflow",
+      "description": "Attempting to cause multiply overflow on same macroetapa",
+      "payload": {
+        "declividade_media_pct": 45.0,
+        "declividade_max_pct": 68.0,
+        "historico_deslizamento_r4": true,
+        "solo_classe": "ARGILOSO",
+        "pct_app_area": 0.0,
+        "overlaps_area_uniao": false
+      },
+      "expected": {
+        "status_code": 200,
+        "has_ajustes_custo": true,
+        "macroetapa": "contenções",
+        "max_fator_ajuste": 3.0
+      }
+    }
+  ]
+}
