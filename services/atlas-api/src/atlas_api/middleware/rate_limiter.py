@@ -5,6 +5,7 @@ Detecta tentativas de exploração por padrões repetitivos.
 """
 
 import hashlib
+import json
 import time
 from typing import Dict, Optional
 from collections import defaultdict

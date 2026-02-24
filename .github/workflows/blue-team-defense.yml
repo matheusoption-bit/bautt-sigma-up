@@ -179,9 +179,14 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
       - name: Install dependencies
         run: pip install pytest fastapi httpx
+      - name: Install services
+        run: |
+          pip install -e services/atlas-engine
+          pip install -e services/atlas-api
+          pip install -e services/delta-engine
       - name: Run rate limiting tests
         run: |
-          pytest services/atlas-engine/tests/security/test_rate_limiting.py -v
+          pytest services/atlas-api/tests/security/test_rate_limiting.py -v
 
   integration-tests:
     name: "\U0001F517 ATLAS + DELTA Integration Tests"

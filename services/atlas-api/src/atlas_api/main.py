@@ -6,8 +6,10 @@ from typing import Any, Dict, Optional
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
+from starlette.middleware.base import BaseHTTPMiddleware
 
 from atlas_api.schemas import ApplyAtlasRequest, ATLASReportResponse, DeltaApplyResponse, TerrainMetricsInput
+from atlas_api.middleware.rate_limiter import SmartRateLimiter, RateLimitConfig
 
 # ---- imports dos engines (instalados via pip install -e .) ----
 from atlas_engine.atlas_engine import ATLASEngine, ATLASBlockedException
@@ -28,6 +30,53 @@ def _load_ruleset() -> Dict[str, Any]:
 ENGINE = ATLASEngine(ruleset=_load_ruleset())
 
 app = FastAPI(title="Bautt ATLAS API", version="0.1.0")
+
+# Initialize rate limiter with configurable settings
+# Can be overridden for testing by setting app.state.rate_limiter
+rate_limiter = SmartRateLimiter(config=RateLimitConfig())
+
+
+# Add rate limiter middleware
+@app.middleware("http")
+async def rate_limit_middleware(request, call_next):
+    """Apply rate limiting to evaluation endpoints."""
+    # Only apply to /atlas/evaluate and /delta/apply-atlas
+    if request.url.path in ["/atlas/evaluate", "/delta/apply-atlas"]:
+        try:
+            # Read body for rate limit check
+            body = await request.body()
+            payload = {}
+            if body:
+                import json
+                payload = json.loads(body)
+
+            # Check rate limit
+            block_result = rate_limiter.check_rate_limit(request, payload)
+
+            if block_result and block_result.get("blocked"):
+                return JSONResponse(
+                    status_code=429,
+                    content={
+                        "error": "RATE_LIMIT_EXCEEDED",
+                        "message": block_result["message"],
+                        "retry_after": block_result["retry_after"],
+                        "details": block_result
+                    }
+                )
+
+            # Recreate request with body (since we consumed it)
+            from starlette.datastructures import Headers
+            async def receive():
+                return {"type": "http.request", "body": body}
+
+            request._receive = receive
+
+        except Exception as e:
+            # Don't block on middleware errors - log and continue
+            pass
+
+    response = await call_next(request)
+    return response
 
 @app.get("/health")
 def health():
