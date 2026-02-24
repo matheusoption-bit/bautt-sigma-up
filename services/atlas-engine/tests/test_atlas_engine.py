@@ -1,5 +1,6 @@
-import sys
+import json
 import unittest
+from pathlib import Path
 
 from atlas_engine.atlas_engine import ATLASEngine, ATLASBlockedException
 
@@ -8,7 +9,12 @@ try:
 except Exception:
     aplicar_atlas_ao_orcamento = None
 
-RULESET_V02 = {
+# Fonte única de verdade: carrega do arquivo JSON de produção
+# parents[0] = tests/, parents[1] = atlas-engine/
+_RULESET_PATH = Path(__file__).parents[1] / "config" / "atlas_ruleset_v0.2.json"
+RULESET_V02 = json.loads(_RULESET_PATH.read_text(encoding="utf-8"))
+
+_RULESET_V02_INLINE_STUB = {
     "version": "0.2.0",
     "metadata": {"name": "ATLAS_RULESET"},
     "caps_fator_custo": {

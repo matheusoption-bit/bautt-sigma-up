@@ -1,19 +1,17 @@
-# DEPRECIADO — mantido apenas para retrocompatibilidade de scripts externos.
-# Use diretamente: from delta_engine.integration_contract import ...
-# (requer pip install -e services/delta-engine)
-import warnings
-warnings.warn(
-    "delta_integration_contract.py na raiz está depreciado. "
-    "Importe de delta_engine.integration_contract diretamente.",
-    DeprecationWarning,
-    stacklevel=2,
-)
-from delta_engine.integration_contract import (  # noqa: F401
-    ATLASBlockedException,
-    OrcamentoAjustado,
-    aplicar_atlas_ao_orcamento,
-)
+from __future__ import annotations
 
+from dataclasses import dataclass, asdict
+from typing import Any, Dict, List
+import copy
+import hashlib
+import json
+
+
+class ATLASBlockedException(Exception):
+    def __init__(self, bloqueios: List[Dict[str, Any]], mensagem: str = "Viabilidade bloqueada pelo ATLAS"):
+        self.bloqueios = bloqueios or []
+        self.mensagem = mensagem
+        super().__init__(f"{mensagem}: {self.bloqueios}")
 
 
 @dataclass

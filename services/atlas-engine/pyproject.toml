@@ -6,3 +6,15 @@ build-backend="setuptools.build_meta"
 name="atlas_engine"
 version="0.1.0"
 requires-python=">=3.11"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-dir]
+"" = "src"
+
+[tool.pytest.ini_options]
+# Exclui testes de segurança que dependem de libs externas (hypothesis, etc.)
+# Para rodá-los: pip install hypothesis e executar explicitamente
+testpaths = ["tests"]
+norecursedirs = ["security", ".venv", ".git", "__pycache__", "*.egg-info"]

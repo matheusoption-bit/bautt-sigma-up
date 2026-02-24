@@ -5,13 +5,8 @@ import copy
 import json
 import re
 
-try:
-    from delta_integration_contract import ATLASBlockedException as DeltaATLASBlockedException
-except Exception:
-    DeltaATLASBlockedException = None
-
-
-class ATLASBlockedException(DeltaATLASBlockedException or Exception):
+class ATLASBlockedException(Exception):
+    """Levantada quando o ATLAS bloqueia a viabilidade do terreno (gating rules)."""
     def __init__(self, bloqueios: List[Dict[str, Any]], mensagem: str = "Viabilidade bloqueada pelo ATLAS", atlas_report: Optional[Dict[str, Any]] = None):
         self.bloqueios = bloqueios or []
         self.mensagem = mensagem

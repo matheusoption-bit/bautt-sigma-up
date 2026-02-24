@@ -9,21 +9,13 @@ from fastapi.responses import JSONResponse
 
 from atlas_api.schemas import ApplyAtlasRequest, ATLASReportResponse, DeltaApplyResponse, TerrainMetricsInput
 
-# ---- path wiring (repo-local) ----
-REPO_ROOT = Path(__file__).resolve().parents[4]
-ATLAS_ENGINE_SRC = REPO_ROOT / "services" / "atlas-engine" / "src"
-DELTA_ENGINE_SRC = REPO_ROOT / "services" / "delta-engine" / "src"
+# ---- imports dos engines (instalados via pip install -e .) ----
+from atlas_engine.atlas_engine import ATLASEngine, ATLASBlockedException
+from delta_engine.integration_contract import aplicar_atlas_ao_orcamento
 
-import sys
-sys.path.append(str(ATLAS_ENGINE_SRC))
-sys.path.append(str(DELTA_ENGINE_SRC))
-sys.path.append(str(REPO_ROOT))
-
-# ---- imports from engines/contracts ----
-from atlas_engine.atlas_engine import ATLASEngine, ATLASBlockedException  # type: ignore
-from delta_engine.integration_contract import aplicar_atlas_ao_orcamento  # type: ignore
-
-# ---- ruleset loading ----
+# ---- carregamento do ruleset ----
+# Caminho para o ruleset canônico do atlas-engine
+# parents[0]=atlas_api, [1]=src, [2]=atlas-api, [3]=services
 RULESET_PATH = (Path(__file__).resolve().parents[3] / "atlas-engine" / "config" / "atlas_ruleset_v0.2.json")
 
 def _load_ruleset() -> Dict[str, Any]:

@@ -1,10 +1,11 @@
-from __future__ import annotations
-from pathlib import Path
-import sys
-
-# Make sure local atlas-engine/src is importable
-REPO_ROOT = Path(__file__).resolve().parent
-ATLAS_ENGINE_SRC = REPO_ROOT / "services" / "atlas-engine" / "src"
-sys.path.append(str(ATLAS_ENGINE_SRC))
-
-from atlas_engine import ATLASEngine, ATLASBlockedException  # noqa: F401
+# DEPRECIADO — mantido apenas para retrocompatibilidade de scripts externos.
+# Use diretamente: from atlas_engine.atlas_engine import ATLASEngine, ATLASBlockedException
+# (requer pip install -e services/atlas-engine)
+import warnings
+warnings.warn(
+    "atlas_engine_v02.py na raiz está depreciado. "
+    "Importe de atlas_engine.atlas_engine diretamente.",
+    DeprecationWarning,
+    stacklevel=2,
+)
+from atlas_engine.atlas_engine import ATLASEngine, ATLASBlockedException  # noqa: F401

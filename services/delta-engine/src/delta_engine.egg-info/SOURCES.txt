@@ -1,0 +1,9 @@
+README.md
+pyproject.toml
+src/delta_engine/__init__.py
+src/delta_engine/integration_contract.py
+src/delta_engine.egg-info/PKG-INFO
+src/delta_engine.egg-info/SOURCES.txt
+src/delta_engine.egg-info/dependency_links.txt
+src/delta_engine.egg-info/top_level.txt
+tests/test_delta_contract.py
