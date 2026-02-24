@@ -1,0 +1,1 @@
+-- init.sql base – preencha com o script completo da conversa

@@ -1,0 +1,21 @@
+{
+  "version": "0.2.0",
+  "metadata": {
+    "name": "ATLAS_RULESET",
+    "created_at": "2026-02-24"
+  },
+  "caps_fator_custo": {
+    "default": {}
+  },
+  "regras_simples": [],
+  "regras_compostas": [],
+  "gating_rules": [],
+  "priorizacao_regras": {
+    "order": [
+      "gating_rules",
+      "regras_compostas",
+      "regras_simples"
+    ],
+    "conflict_default_strategy": "max_factor"
+  }
+}
